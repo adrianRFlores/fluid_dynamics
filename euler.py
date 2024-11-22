@@ -13,6 +13,7 @@ iterations = 100
 overrelaxation = 1.9
 g = 0
 density = 1000
+in_velocity = 0.5
 
 # Initialize velocity and pressure
 u = np.zeros((nx, ny))
@@ -136,6 +137,14 @@ for i in range(nx):
             state = 0 # Solid
         s[i, j] = state
 
+def extrapolate():
+    for i in range(nx):
+        u[i, 0] = u[i, 1]
+        u[i, ny - 1] = u[i, ny - 2]
+    for j in range(ny):
+        v[0, j] = v[1, j]
+        v[nx - 1, j] = v[nx - 2, j]
+
 def step():
 
     for j in range(int(nx / 4), int(nx - nx / 4)):
@@ -148,6 +157,7 @@ def step():
     p = np.zeros((nx, ny))
 
     gauss_seidel()
+    extrapolate()
     advect()
 
     pass
