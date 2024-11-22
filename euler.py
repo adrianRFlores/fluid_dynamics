@@ -6,13 +6,13 @@ import matplotlib.pyplot as plt
 
 # Grid size and parameters
 nx, ny = 50, 50
-dx, dy = 1, 1
+dx, dy = 0.001, 0.001
 dt = 1/120
 nu = 0.1  # Viscosity
 iterations = 100
-overrelaxation = 1.9
+overrelaxation = 1.7
 g = 0
-density = 1000
+density = 1
 in_velocity = 0.5
 
 # Initialize velocity and pressure
@@ -20,15 +20,7 @@ u = np.zeros((nx, ny))
 v = np.zeros((nx, ny))
 s = np.zeros((nx, ny))
 p = np.zeros((nx, ny))
-
-def obstacle(x, y, r):
-    for i in range(nx - 2):
-        for j in range(ny - 2):
-            s[i, j] = 1.0
-            delta_x = (i + 0.5) * dx - x
-            delta_y = (j + 0.5) * dx - y
-            if delta_x ** 2 + delta_y ** 2 < r ** 2:
-                s[i, j] = 0
+m = np.zeros((nx, ny))
 
 def update_velocity():
     for i in range(1, nx-1):
@@ -68,6 +60,15 @@ def gauss_seidel():
                 v[i, j + 1] += sy1 * d
 
                 p[i, j] += d * cp
+
+def obstacle(x, y, r):
+    for i in range(nx - 2):
+        for j in range(ny - 2):
+            s[i, j] = 1.0
+            delta_x = (i + 0.5) * dx - x
+            delta_y = (j + 0.5) * dx - y
+            if delta_x ** 2 + delta_y ** 2 < r ** 2:
+                s[i, j] = 0
 
 def getSample(x, y, field_type):
     n = ny
@@ -139,13 +140,6 @@ def advect():
     u = tempU
     v = tempV
 
-for i in range(nx):
-    for j in range(ny):
-        state = 1 # Fluid
-        if i == 0 or j == 0 or j == ny - 1: # Border
-            state = 0 # Solid
-        s[i, j] = state
-
 def extrapolate():
     for i in range(nx):
         u[i, 0] = u[i, 1]
@@ -154,12 +148,18 @@ def extrapolate():
         v[0, j] = v[1, j]
         v[nx - 1, j] = v[nx - 2, j]
 
-obstacle(25, 25, 5)
+# Simulation Setup
+for i in range(nx):
+    for j in range(ny):
+        state = 1 # Fluid
+        if i == 0 or j == 0 or j == ny - 1: # Border
+            state = 0 # Solid
+        s[i, j] = state
+
+        if i in range(20, 30) and j == 1:
+            v[i, j] = in_velocity
 
 def step():
-
-    #for j in range(int(nx / 4), int(nx - nx / 4)):
-        #u[1, j] = in_velocity
 
     # Apply the Gauss-Seidel method to enforce incompressibility
     update_velocity()
@@ -172,6 +172,8 @@ def step():
     advect()
 
     pass
+
+obstacle(25, 25, 5)
 
 # Set up an empty list to store frames
 frames = []
@@ -191,5 +193,4 @@ for _ in tqdm(range(50)):
     plt.close(fig)  # Close the figure to save memory
 
 # Save all frames as a GIF
-frames[0].save("simulation.gif", save_all=True, append_images=frames[1:], duration=300, loop=0)
-
+frames[0].save("simulation.gif", save_all=True, append_images=frames[1:], duration=100, loop=0)
