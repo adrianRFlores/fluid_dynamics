@@ -5,7 +5,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 # Grid size and parameters
-nx, ny = 10, 10
+nx, ny = 50, 50
 dx, dy = 1, 1
 dt = 1/120
 nu = 0.1  # Viscosity
@@ -21,11 +21,20 @@ v = np.zeros((nx, ny))
 s = np.zeros((nx, ny))
 p = np.zeros((nx, ny))
 
+def obstacle(x, y, r):
+    for i in range(nx - 2):
+        for j in range(ny - 2):
+            s[i, j] = 1.0
+            delta_x = (i + 0.5) * dx - x
+            delta_y = (j + 0.5) * dx - y
+            if delta_x ** 2 + delta_y ** 2 < r ** 2:
+                s[i, j] = 0
+
 def update_velocity():
     for i in range(1, nx-1):
         for j in range(1, ny-1):
             if s[i, j] != 0 and s[i, j - 1] != 0:
-                v[i, j] += g * dt
+                u[i, j] += g * dt
 
 def gauss_seidel():
 
@@ -145,10 +154,12 @@ def extrapolate():
         v[0, j] = v[1, j]
         v[nx - 1, j] = v[nx - 2, j]
 
+obstacle(25, 25, 5)
+
 def step():
 
-    for j in range(int(nx / 4), int(nx - nx / 4)):
-        u[1, j] = in_velocity
+    #for j in range(int(nx / 4), int(nx - nx / 4)):
+        #u[1, j] = in_velocity
 
     # Apply the Gauss-Seidel method to enforce incompressibility
     update_velocity()
