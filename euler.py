@@ -152,3 +152,23 @@ def step():
 
     pass
 
+# Set up an empty list to store frames
+frames = []
+
+# Simulate and save each frame
+for _ in tqdm(range(50)):
+    step()  # Your simulation step function
+    fig, ax = plt.subplots()
+    im = ax.imshow(p, cmap='turbo')
+    plt.colorbar(im, ax=ax)
+    #ax.quiver(u, v)
+    
+    # Save the current frame to a numpy array
+    fig.canvas.draw()
+    frame = np.array(fig.canvas.renderer.buffer_rgba())
+    frames.append(Image.fromarray(frame))
+    plt.close(fig)  # Close the figure to save memory
+
+# Save all frames as a GIF
+frames[0].save("simulation.gif", save_all=True, append_images=frames[1:], duration=300, loop=0)
+
