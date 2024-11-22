@@ -119,7 +119,7 @@ def advect():
             if s[i, j] != 0 and s[i, j - 1] != 0 and i < nx - 1:
                 x = i * h + h2
                 y = j * h
-                u_sample = (v[i, j] + v[i, j - 1] + v[i + 1, j - 1] + v[i + 1, j]) * 0.25
+                u_sample = (u[i, j] + u[i, j - 1] + u[i + 1, j - 1] + u[i + 1, j]) * 0.25
                 v_sample = v[i, j]
 
                 x -= dt * u_sample
