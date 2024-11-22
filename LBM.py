@@ -54,6 +54,8 @@ weights = np.array(
 
 F = np.ones((ny, nx, 9)) + 0.01 * np.random.randn(ny, nx, 9)
 
+F[:, :, 3] = 2.3
+
 obstacle = Obstacle(75, 40, 10, 'cube')
 obstacle2 = Obstacle(150, 70, 15, 'circle')
 obstacle3 = Obstacle(230, 30, 8, 'circle')
@@ -97,7 +99,7 @@ for _ in tqdm(range(steps)):
         fig, ax = plt.subplots()
         im = ax.imshow(velocity_vector, cmap='turbo')
         plt.colorbar(im, ax=ax)
-        plt.title(f'{_}')
+        plt.title(f'Step {_}')
         #ax.quiver(u, v)
         
         # Save the current frame to a numpy array
