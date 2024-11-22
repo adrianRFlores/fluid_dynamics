@@ -70,6 +70,13 @@ def obstacle(x, y, r):
             if delta_x ** 2 + delta_y ** 2 < r ** 2:
                 s[i, j] = 0
 
+def check_divergence():
+    divergence = np.zeros((nx, ny))
+    for i in range(1, nx - 1):
+        for j in range(1, ny - 1):
+            divergence[i, j] = (u[i + 1, j] - u[i, j]) / dx + (v[i, j + 1] - v[i, j]) / dy
+    return divergence
+
 def getSample(x, y, field_type):
     n = ny
     h = dx
@@ -181,10 +188,16 @@ frames = []
 # Simulate and save each frame
 for _ in tqdm(range(50)):
     step()  # Your simulation step function
+    div = check_divergence()
+    non_div_count = 0
+    for i in range(nx):
+        for j in range(ny):
+            if div[i, j] > 0.01 or div[i, j] < -0.01:
+                non_div_count += 1
     fig, ax = plt.subplots()
     im = ax.imshow(p, cmap='turbo')
     plt.colorbar(im, ax=ax)
-    #ax.quiver(u, v)
+    plt.title(f'Step {_}')
     
     # Save the current frame to a numpy array
     fig.canvas.draw()
